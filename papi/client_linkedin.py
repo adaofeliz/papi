@@ -3,7 +3,11 @@ from __future__ import unicode_literals
 from config import config
 
 import time
+import pytz
 
+from pytz import timezone
+from dateutil import parser
+from datetime import datetime, timedelta
 from common_cachefetcher import fetcher
 from requests_oauthlib import OAuth1
 
@@ -30,8 +34,8 @@ def getLinkedinNotifications(delta_days):
 
 	try:
 
-		time_after = int(round(time.time() * 1000)) - (delta_days * 86400000)
-		r = fetcher.get_oauth("https://api.linkedin.com/v1/people/~/network/updates?scope=self&format=json&oauth2_access_token=%s&after=%d" % (ACCESS_TOKEN, time_after), get_oauth(), CACHE_TIMEOUT)
+		time_after2 = (int(datetime.now(pytz.timezone("UTC")).replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).strftime("%s")) * 1000)  - ((delta_days - 1) * 86400000)
+		r = fetcher.get_oauth("https://api.linkedin.com/v1/people/~/network/updates?scope=self&format=json&oauth2_access_token=%s&after=%d" % (ACCESS_TOKEN, time_after2), get_oauth(), CACHE_TIMEOUT)
 		linkedin_json = r.json()
 
 		if linkedin_json['_total']:
