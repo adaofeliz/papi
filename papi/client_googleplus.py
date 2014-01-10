@@ -9,7 +9,7 @@ from pytz import timezone
 from dateutil import parser
 from datetime import datetime, timedelta
 
-from util_cachefetcher import fetcher
+from common_cachefetcher import fetcher
 
 USER_ID = config['googleplus']['USER_ID']
 KEY = config['googleplus']['KEY']
@@ -17,12 +17,12 @@ CACHE_TIMEOUT = config['googleplus']['CACHE_TIMEOUT']
 
 def getGoogleplusNotifications(delta_days):
 
+	response = 0
+	
 	try:
-			
+
 		r = fetcher.get('https://www.googleapis.com/plus/v1/people/%s/activities/public?key=%s&days=%d' % (USER_ID, KEY, delta_days), CACHE_TIMEOUT)
 		googleplus_json = r.json()
-
-		response = 0
 		
 		localtz = timezone('UTC')
 		one_day_ago = localtz.localize(datetime.now() - timedelta(days = delta_days))
@@ -35,4 +35,4 @@ def getGoogleplusNotifications(delta_days):
 	except:
 		response = -1
 
-	return '{ \"googleplus_notifications\" : %d }' % (response)
+	return {'googleplus': response}

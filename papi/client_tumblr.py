@@ -4,7 +4,11 @@ from config import config
 
 import time
 
-from util_cachefetcher import fetcher
+from pytz import timezone
+from dateutil import parser
+from datetime import datetime, timedelta
+
+from common_cachefetcher import fetcher
 from requests_oauthlib import OAuth1
 
 USER_ID = config['tumblr']['USER_ID']
@@ -24,17 +28,23 @@ def get_oauth():
                 resource_owner_secret=OAUTH_TOKEN_SECRET)
     return oauth
 
-def getTumblrNotifications(delta_days_implement):
+def getTumblrNotifications(delta_days):
+
+	response = 0
 
 	try:
-		r = fetcher.get_oauth("http://api.tumblr.com/v2/blog/%s/posts?api_key=%s&days%d" % (USER_ID, CONSUMER_KEY, delta_days_implement), get_oauth(), CACHE_TIMEOUT)
+		r = fetcher.get_oauth("http://api.tumblr.com/v2/blog/%s/posts?api_key=%s&days%d" % (USER_ID, CONSUMER_KEY, delta_days), get_oauth(), CACHE_TIMEOUT)
 		tumblr_json = r.json()
+		
+		localtz = timezone('UTC')
+		one_day_ago = localtz.localize(datetime.now() - timedelta(days = delta_days))
 
-		response = 0
-		if tumblr_json['response']:
-			response = tumblr_json['response']['total_posts']
+		for item in tumblr_json['response']['posts']:
+		    item_datetime = parser.parse(item['date'])
+		    if item_datetime > one_day_ago:
+	    		response = response + 1
 
 	except:
 		response = -1	
 
-	return '{ \"tumblr_notifications\" : %d }' % (response)
+	return {'tumblr': response}

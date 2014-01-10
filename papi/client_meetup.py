@@ -5,16 +5,16 @@ from config import config
 import requests
 import time
 
-from util_cachefetcher import fetcher
+from common_cachefetcher import fetcher
 
 KEY = config['meetup']['KEY']
 CACHE_TIMEOUT = config['meetup']['CACHE_TIMEOUT']
 
 def getMeetupNotifications(delta_days_implement):
-
+	
+	response = 0
+	
 	try:
-		
-		response = 0
 
 		r = fetcher.get('https://api.meetup.com/dashboard?key=%s&days=%d' % (KEY, delta_days_implement), CACHE_TIMEOUT)
 		meetup_json = r.json()
@@ -25,4 +25,4 @@ def getMeetupNotifications(delta_days_implement):
 	except:
 		response = -1
 
-	return '{ \"meetup_notifications\" : %d }' % (response)
+	return {'meetup': response}

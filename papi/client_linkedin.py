@@ -4,7 +4,7 @@ from config import config
 
 import time
 
-from util_cachefetcher import fetcher
+from common_cachefetcher import fetcher
 from requests_oauthlib import OAuth1
 
 CONSUMER_KEY = config['linkedin']['CONSUMER_KEY']
@@ -26,13 +26,14 @@ def get_oauth():
 
 def getLinkedinNotifications(delta_days):
 		
+	response = 0
+
 	try:
 
 		time_after = int(round(time.time() * 1000)) - (delta_days * 86400000)
 		r = fetcher.get_oauth("https://api.linkedin.com/v1/people/~/network/updates?scope=self&format=json&oauth2_access_token=%s&after=%d" % (ACCESS_TOKEN, time_after), get_oauth(), CACHE_TIMEOUT)
 		linkedin_json = r.json()
 
-		response = 0
 		if linkedin_json['_total']:
 			response = linkedin_json['_total']
 
@@ -40,4 +41,4 @@ def getLinkedinNotifications(delta_days):
 		print Exception, err
 		response = -1	
 
-	return '{ \"linkedin_notifications\" : %d }' % (response)
+	return {'linkedin': response}

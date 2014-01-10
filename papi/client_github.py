@@ -9,16 +9,16 @@ from pytz import timezone
 from dateutil import parser
 from datetime import datetime, timedelta
 
-from util_cachefetcher import fetcher
+from common_cachefetcher import fetcher
 
 USER_ID = config['github']['USER_ID']
 CACHE_TIMEOUT = config['github']['CACHE_TIMEOUT']
 
 def getGithubNotifications(delta_days):
 
+	response = 0
+	
 	try:
-		
-		response = 0
 
 		r = fetcher.get('https://api.github.com/users/%s/events/public?days=%d' % (USER_ID, delta_days), CACHE_TIMEOUT)
 		github_json = r.json()
@@ -34,4 +34,4 @@ def getGithubNotifications(delta_days):
 		response = -1
 
 
-	return '{ \"github_notifications\" : %d }' % (response)
+	return {'github': response}

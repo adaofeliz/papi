@@ -5,7 +5,7 @@ from config import config
 import time
 import pytz
 
-from util_cachefetcher import fetcher
+from common_cachefetcher import fetcher
 from dateutil import parser
 from datetime import datetime, timedelta
 from requests_oauthlib import OAuth1
@@ -27,12 +27,12 @@ def get_oauth():
     return oauth
 
 def getTwitterNotifications(delta_days):
+
+	response = 0
 		
 	try:
 		r = fetcher.get_oauth("https://api.twitter.com/1.1/statuses/user_timeline.json?include_rts=1&exclude_replies=true&contributor_details=false&trim_user=true&days%d" % (delta_days), get_oauth(), CACHE_TIMEOUT)
 		tweets = r.json()
-		
-		response = 0
 
 		localtz = timezone('UTC')
 		one_day_ago = localtz.localize(datetime.now() - timedelta(days = delta_days))
@@ -40,8 +40,8 @@ def getTwitterNotifications(delta_days):
 		    tweeted_datetime = parser.parse(tweet['created_at'])
 		    if tweeted_datetime > one_day_ago:
 		        response = response + 1
-	except Exception, err:
-		print Exception, err
+
+	except:
 		response = -1
 
-	return '{ \"twitter_notifications\" : %d }' % (response)
+	return {'twitter': response}

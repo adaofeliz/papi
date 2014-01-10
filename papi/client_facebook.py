@@ -4,16 +4,16 @@ from config import config
 
 import time
 
-from util_cachefetcher import fetcher
+from common_cachefetcher import fetcher
 
 ACCESS_TOKEN = config['facebook']['ACCESS_TOKEN']
 CACHE_TIMEOUT = config['facebook']['CACHE_TIMEOUT']
 
 def getFacebookNotifications(delta_days_implement):
 
+	response = 0
+	
 	try:
-		
-		response = 0
 
 		r = fetcher.get('https://graph.facebook.com/me/notifications?format=json&suppress_http_code=1&access_token=%s&days=%d' % (ACCESS_TOKEN, delta_days_implement), CACHE_TIMEOUT)
 		facebook_json = r.json()
@@ -25,4 +25,4 @@ def getFacebookNotifications(delta_days_implement):
 		response = -1
 
 
-	return '{ \"facebook_notifications\" : %d }' % (response)
+	return {'facebook': response}
